@@ -10,11 +10,12 @@ except ModuleNotFoundError:
 
 import torch
 import gym
-import gym_hypercube
+#import gym_hypercube
 import matplotlib.pyplot as plt
 
 from commons.utils import NormalizedActions, get_latest_dir
 
+from cfd.flatplate.flatplate import FlatPlate
 
 def load_config(path):
     with open(path, 'r') as file:
@@ -41,7 +42,9 @@ def create_folder(algo_name, game, config):
 
 
 def train(Agent, args):
-    config = load_config(f'agents/{args.agent}/config.yaml')
+    #config = load_config(f'agents/{args.agent}/config.yaml')
+    # TO DO update path for generic name
+    config = load_config(f'cfd/flatplate/config.yaml')
 
     game = config['GAME']['id'].split('-')[0]
     folder = create_folder(args.agent, game, config)
@@ -56,7 +59,8 @@ def train(Agent, args):
     print(f"\033[91m\033[1mDevice : {device}\nFolder : {folder}\033[0m")
 
     # Create gym environment and agent
-    env = NormalizedActions(gym.make(**config["GAME"]))
+    #env = NormalizedActions(gym.make(**config["GAME"]))
+    env = NormalizedActions(FlatPlate(config))
     model = Agent(device, folder, config)
 
     # Load model from a previous run

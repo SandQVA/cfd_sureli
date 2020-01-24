@@ -4,7 +4,7 @@ import torch
 import numpy as np
 
 import gym
-import gym_hypercube
+#import gym_hypercube
 from commons.utils import NormalizedActions
 
 import matplotlib.pyplot as plt
@@ -18,7 +18,8 @@ class Plotter:
         self.folder = folder
         self.config = config
 
-        self.eval_env = NormalizedActions(gym.make(**config["GAME"]))
+        #self.eval_env = NormalizedActions(gym.make(**config["GAME"]))
+        self.eval_env = NormalizedActions(FlatPlate(config))
 
         self.nfig = 1
         self.nfig_actor = 1
