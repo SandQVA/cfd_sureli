@@ -110,6 +110,9 @@ def train(Agent, args):
             rewards.append(episode_reward)
             lenghts.append(step)
 
+            # Sand SAVE variables at the end of episode
+            env.fill_array_tobesaved()
+
             if episode % config["FREQ_SAVE"] == 0:
                 model.save()
 
@@ -142,6 +145,9 @@ def train(Agent, args):
         pass
 
     finally:
+        # DUMP variables at the end of episode
+        env.print_array_in_files(folder)
+        env.plot_some_training_paths(folder)
         env.close()
         model.save()
 
