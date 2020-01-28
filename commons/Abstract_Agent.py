@@ -82,13 +82,28 @@ class AbstractAgent(ABC):
                     reward += r
                     steps += 1
                 rewards.append(reward)
+            #Sand
+            if render:
+                # SAVE variables at the end of episode
+                self.eval_env.fill_array_tobesaved()
 
         except KeyboardInterrupt:
             if not render:
                 raise
 
         finally:
+            #Sand
+            if render:
+                testfolder = f'{self.folder}/test'
+                # Create test folder
+                if not os.path.exists(testfolder):
+                    os.makedirs(testfolder)
+                # DUMP variables at the end of episode
+                self.eval_env.print_array_in_files(testfolder)
+                self.eval_env.plot_some_training_paths(testfolder)
+
             self.eval_env.close()
+
             if gif:
                 print(f"Saved gif in {self.folder+'/results.gif'}")
                 writer.close()
