@@ -100,7 +100,7 @@ class AbstractAgent(ABC):
                     os.makedirs(testfolder)
                 # DUMP variables at the end of episode
                 self.eval_env.print_array_in_files(testfolder)
-                self.eval_env.plot_some_training_paths(testfolder)
+                self.eval_env.plot_some_testing_paths(testfolder)
 
             self.eval_env.close()
 
