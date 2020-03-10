@@ -5,3 +5,7 @@ results.png
 results/
 models/
 runs/
+batch*
+output*
+slurm*
+cfd/
