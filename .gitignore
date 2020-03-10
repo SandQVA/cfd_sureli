@@ -1,11 +1,11 @@
 
 __pycache__/
 
-results.png
-results/
+results*/
 models/
 runs/
 batch*
 output*
 slurm*
 cfd/
+*.sh
