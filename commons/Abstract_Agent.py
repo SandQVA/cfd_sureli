@@ -60,7 +60,7 @@ class AbstractAgent(ABC):
     def optimize(self):
         pass
 
-    def evaluate(self, n_ep=10, render=False, gif=False):
+    def evaluate(self, n_ep=1, render=False, gif=False):
         rewards = []
         if gif:
             writer = imageio.get_writer(self.folder + '/results.gif', duration=0.005)
@@ -82,6 +82,7 @@ class AbstractAgent(ABC):
                     reward += r
                     steps += 1
                 rewards.append(reward)
+                self.eval_env.print_won_or_lost(state)
             #Sand
             if render:
                 # SAVE variables at the end of episode

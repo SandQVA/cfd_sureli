@@ -145,7 +145,7 @@ def train(Agent, args):
         pass
 
     finally:
-        # DUMP variables at the end of episode
+        # DUMP variables at the end of training
         env.print_array_in_files(folder)
         env.plot_training_output(rewards, folder)
         env.close()
