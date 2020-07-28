@@ -82,7 +82,7 @@ class AbstractAgent(ABC):
                     reward += r
                     steps += 1
                 rewards.append(reward)
-                self.eval_env.print_won_or_lost(state)
+                self.eval_env.print_won_or_lost(self.eval_env.denormalize_polar_state(state))
             #Sand
             if render:
                 # SAVE variables at the end of episode
