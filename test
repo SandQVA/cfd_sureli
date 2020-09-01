@@ -14,7 +14,7 @@ parser.add_argument('agent', nargs='?', default='DDPG',
                     help="Choose the agent to train (one of {DDPG, TD3, SAC, DQN}).")
 parser.add_argument('--no_render', action='store_false', dest="render",
                     help='Display the tests')
-parser.add_argument('-n', '--nb_tests', default=10, type=int, dest="nb_tests",
+parser.add_argument('-n', '--nb_tests', default=1, type=int, dest="nb_tests",
                     help="Number of evaluation to perform.")
 parser.add_argument('--gif', action='store_true', dest="gif",
                     help='Save a gif of a test')
