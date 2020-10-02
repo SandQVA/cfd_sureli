@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from cfd.flatplate.flatplate import FlatPlate
+from cfd.starccm.CFDcommunication import CFDcommunication
 
 class Plotter:
 
@@ -19,8 +20,12 @@ class Plotter:
         self.folder = folder
         self.config = config
 
-        #self.eval_env = NormalizedActions(gym.make(**config["GAME"]))
-        self.eval_env = NormalizedActions(FlatPlate(config))
+        if config["GAME"]["id"] == "STARCCMexternalfiles":
+            self.eval_env = NormalizedActions(CFDcommunication(config))
+        elif config["GAME"]["id"] == "flatplate":
+            self.eval_env = NormalizedActions(FlatPlate(config))
+        else:
+            self.eval_env = NormalizedActions(gym.make(**config['GAME']))
 
         self.nfig = 1
         self.nfig_actor = 1

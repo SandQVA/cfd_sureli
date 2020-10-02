@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 from commons.utils import NormalizedActions, get_latest_dir
 
 from cfd.flatplate.flatplate import FlatPlate
+from cfd.starccm.CFDcommunication import CFDcommunication
 
 def load_config(path):
     with open(path, 'r') as file:
@@ -44,8 +45,9 @@ def create_folder(algo_name, game, config):
 def train(Agent, args):
     #config = load_config(f'agents/{args.agent}/config.yaml')
     # TO DO update path for generic name
-    config = load_config(f'cfd/flatplate/config.yaml')
-
+    #config = load_config(f'cfd/flatplate/config.yaml')
+    config = load_config(f'cfd/starccm/config.yaml')
+    
     game = config['GAME']['id'].split('-')[0]
     folder = create_folder(args.agent, game, config)
 
@@ -59,8 +61,12 @@ def train(Agent, args):
     print(f"\033[91m\033[1mDevice : {device}\nFolder : {folder}\033[0m")
 
     # Create gym environment and agent
-    #env = NormalizedActions(gym.make(**config["GAME"]))
-    env = NormalizedActions(FlatPlate(config))
+    if config["GAME"]["id"] == "STARCCMexternalfiles":
+        env = NormalizedActions(CFDcommunication(config))
+    elif config["GAME"]["id"] == "flatplate":
+        env = NormalizedActions(FlatPlate(config))
+    else:
+        env = NormalizedActions(gym.make(**config['GAME']))
     model = Agent(device, folder, config)
 
     # Load model from a previous run
@@ -94,9 +100,19 @@ def train(Agent, args):
             while not done and step < config["MAX_STEPS"]:
 
                 action = model.select_action(state, episode=episode)
-
+                
+                if config["GAME"]["id"] == "STARCCMexternalfiles":
+                    env.finishCFD()
+                
                 next_state, reward, done, _ = env.step(action)
                 episode_reward += reward
+
+                if config["GAME"]["id"] == "STARCCMexternalfiles":
+                    #set as done if the number of maximum steps is reached even if not
+                    #reached the final position to avoid the simulation to continue
+                    if not done and step == config["MAX_STEPS"] - 1:
+                        done = True
+                
 
                 # Save transition into memory
                 model.memory.push(state, action, reward, next_state, done)
@@ -150,6 +166,9 @@ def train(Agent, args):
         env.plot_training_output(rewards, folder)
         env.close()
         model.save()
+        if config["GAME"]["id"] == "STARCCMexternalfiles":
+            #end simulation of STARCCM+
+            env.finishCFD(True)
 
     time_execution = time.time() - time_beginning
 
@@ -181,5 +200,5 @@ def test(Agent, args):
     model = Agent(device, args.folder, config)
     model.load()
 
-    score = model.evaluate(n_ep=args.nb_tests, render=args.render, gif=args.gif)
+    score = model.evaluate(n_ep=args.nb_tests, render=args.render, gif=args.gif, test=True)
     print(f"Average score : {score}")
