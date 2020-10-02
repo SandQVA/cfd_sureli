@@ -27,7 +27,7 @@ class AbstractAgent(ABC):
         #FLATPLATE/STARCCM/ELLIPSE
         if config["GAME"]["id"] == "STARCCMexternalfiles":
             self.eval_env = NormalizedActions(CFDcommunication(config))
-        elif config["GAME"]["id"] == "flateplate":
+        elif config["GAME"]["id"] == "flatplate":
             self.eval_env = NormalizedActions(FlatPlate(config))
         else:
             self.eval_env = NormalizedActions(gym.make(**self.config['GAME']))
@@ -67,7 +67,7 @@ class AbstractAgent(ABC):
     def optimize(self):
         pass
 
-    def evaluate(self, n_ep=1, render=False, gif=False):
+    def evaluate(self, n_ep=1, render=False, gif=False, test=False):
         rewards = []
         if gif:
             writer = imageio.get_writer(self.folder + '/results.gif', duration=0.005)
@@ -81,17 +81,26 @@ class AbstractAgent(ABC):
                 steps = 0
                 while not done and steps < self.config['MAX_STEPS']:
                     action = self.select_action(state, evaluation=True)
+                    if self.config["GAME"]["id"] == "STARCCMexternalfiles":
+                        self.eval_env.finishCFD()        
                     state, r, done, _ = self.eval_env.step(action)
                     if render:
                         self.eval_env.render()
                     if i == 0 and gif:
                         writer.append_data(self.eval_env.render(mode='rgb_array'))
                     reward += r
+                    if self.config["GAME"]["id"] == "STARCCMexternalfiles":
+                        #set as done if the number of maximum steps is reached even if not
+                        #reached the final position to avoid the simulation to continue
+                        if not done and steps == self.config["MAX_STEPS"] - 1:
+                            done = True                           
                     steps += 1
                 rewards.append(reward)
-                self.eval_env.print_won_or_lost(self.eval_env.denormalize_polar_state(state))
-            #Sand
-            if render:
+             
+                if self.config["GAME"]["id"] == "flatplate":
+                    self.eval_env.print_won_or_lost(self.eval_env.denormalize_polar_state(state))
+
+            if test:
                 # SAVE variables at the end of episode
                 self.eval_env.fill_array_tobesaved()
 
@@ -101,7 +110,7 @@ class AbstractAgent(ABC):
 
         finally:
             #Sand
-            if render:
+            if test:
                 testfolder = f'{self.folder}/test'
                 # Create test folder
                 if not os.path.exists(testfolder):
@@ -115,6 +124,11 @@ class AbstractAgent(ABC):
             if gif:
                 print(f"Saved gif in {self.folder+'/results.gif'}")
                 writer.close()
+
+            if test and self.config["GAME"]["id"] == "STARCCMexternalfiles":
+                #end simulation of STARCCM+
+                print('je coupe bien star')
+                self.eval_env.finishCFD(True)
 
         score = sum(rewards)/len(rewards) if rewards else 0
         return score
