@@ -100,7 +100,7 @@ class AbstractAgent(ABC):
                 if self.config["GAME"]["id"] == "flatplate":
                     self.eval_env.print_won_or_lost(self.eval_env.denormalize_polar_state(state))
 
-            if test:
+            if test and args.appli:
                 # SAVE variables at the end of episode
                 self.eval_env.fill_array_tobesaved()
 
@@ -116,8 +116,9 @@ class AbstractAgent(ABC):
                 if not os.path.exists(testfolder):
                     os.makedirs(testfolder)
                 # DUMP variables at the end of episode
-                self.eval_env.print_array_in_files(testfolder)
-                self.eval_env.plot_testing_output(rewards, testfolder)
+                if args.appli:
+                    self.eval_env.print_array_in_files(testfolder)
+                    self.eval_env.plot_testing_output(rewards, testfolder)
 
             self.eval_env.close()
 
@@ -127,7 +128,6 @@ class AbstractAgent(ABC):
 
             if test and self.config["GAME"]["id"] == "STARCCMexternalfiles":
                 #end simulation of STARCCM+
-                print('je coupe bien star')
                 self.eval_env.finishCFD(True)
 
         score = sum(rewards)/len(rewards) if rewards else 0

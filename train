@@ -13,6 +13,8 @@ parser.add_argument('agent', nargs='?', default='DDPG',
                     help="Choose the agent to train (one of {DDPG, TD3, SAC, DQN}).")
 parser.add_argument('--no_gpu', action='store_false', dest='gpu', help="Don't use GPU")
 parser.add_argument('--load', dest='load', type=str, help="Load model")
+parser.add_argument('--appli', dest='appli', type=str, 
+                    help="Choose the CFD environment (one of {flatplate, starccm, starccm_diamant}).")
 args = parser.parse_args()
 
 

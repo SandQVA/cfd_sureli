@@ -43,11 +43,19 @@ def create_folder(algo_name, game, config):
 
 
 def train(Agent, args):
-    #config = load_config(f'agents/{args.agent}/config.yaml')
-    # TO DO update path for generic name
-    #config = load_config(f'cfd/flatplate/config.yaml')
-    config = load_config(f'cfd/starccm/config.yaml')
-    
+
+    if args.appli:
+        if args.appli == 'flatplate':
+            print('running flatplate environment')
+            config = load_config(f'cfd/flatplate/config.yaml')
+        elif args.appli == 'starccm':
+            print('running starccm naca012 environment')
+            config = load_config(f'cfd/starccm/config.yaml')
+        else:
+            print('the CFD environment is not properly defined')
+    else:
+        config = load_config(f'agents/{args.agent}/config.yaml')
+
     game = config['GAME']['id'].split('-')[0]
     folder = create_folder(args.agent, game, config)
 
@@ -126,8 +134,8 @@ def train(Agent, args):
             rewards.append(episode_reward)
             lenghts.append(step)
 
-            # Sand SAVE variables at the end of episode
-            env.fill_array_tobesaved()
+            if args.appli:
+                env.fill_array_tobesaved()
 
             if episode % config["FREQ_SAVE"] == 0:
                 model.save()
@@ -162,8 +170,10 @@ def train(Agent, args):
 
     finally:
         # DUMP variables at the end of training
-        env.print_array_in_files(folder)
-        env.plot_training_output(rewards, folder)
+        if args.appli:
+            env.print_array_in_files(folder)
+            env.plot_training_output(rewards, folder)
+
         env.close()
         model.save()
         if config["GAME"]["id"] == "STARCCMexternalfiles":
