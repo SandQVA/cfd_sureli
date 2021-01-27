@@ -1,5 +1,5 @@
-
-GAME : "LunarLanderContinuous-v2"
+GAME : "Pendulum-v0"
+# GAME : "LunarLanderContinuous-v2"
 
 HIDDEN_LAYERS : [400, 300]
 
